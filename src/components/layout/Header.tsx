@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
@@ -22,13 +23,15 @@ const Header = () => {
           <span className="text-xl font-semibold">Avenrae</span>
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-4">
           <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
             Home
           </Link>
           <Link to="/practitioners" className="text-sm font-medium transition-colors hover:text-primary">
             Practitioners
           </Link>
+          
+          <ThemeToggle />
           
           {user ? (
             <DropdownMenu>
