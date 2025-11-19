@@ -3,10 +3,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Menu } from "lucide-react";
+import { useState } from "react";
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
   const getInitials = () => {
     if (!profile) return "U";
@@ -23,7 +27,8 @@ const Header = () => {
           <span className="text-xl font-semibold">Avenrae</span>
         </Link>
 
-        <nav className="flex items-center gap-4">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4">
           <Link to="/practitioners" className="text-sm font-medium transition-colors hover:text-primary">
             Practitioners
           </Link>
@@ -61,6 +66,53 @@ const Header = () => {
             </>
           )}
         </nav>
+
+        {/* Mobile Navigation */}
+        <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <div className="flex flex-col gap-4 mt-8">
+                <Link 
+                  to="/practitioners" 
+                  className="text-lg font-medium transition-colors hover:text-primary"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Practitioners
+                </Link>
+                
+                {user ? (
+                  <>
+                    <Link 
+                      to="/dashboard" 
+                      className="text-lg font-medium transition-colors hover:text-primary"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Button variant="ghost" onClick={() => { signOut(); setIsOpen(false); }} className="justify-start">
+                      Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setIsOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">Log in</Button>
+                    </Link>
+                    <Link to="/signup" onClick={() => setIsOpen(false)}>
+                      <Button className="w-full">Get Started</Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
