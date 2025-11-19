@@ -121,15 +121,27 @@ export default function AdminVerification() {
   return (
     <>
       <Helmet>
-        <title>Practitioner Verification - Admin - Avenrae</title>
+        <title>Verification Queue - Admin</title>
+        <meta name="description" content="Review and approve practitioner verification applications" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Practitioner Verification Queue</h1>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Verification Queue</h1>
+          <p className="text-muted-foreground mt-2">
+            Review and approve practitioner applications
+          </p>
+        </div>
 
         {practitioners.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground">No pending verifications</p>
+          <Card>
+            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+              <CheckCircle className="h-12 w-12 text-green-600 mb-4" />
+              <p className="text-lg font-medium">No pending verifications</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                All practitioner applications have been reviewed
+              </p>
+            </div>
           </Card>
         ) : (
           <div className="grid gap-6">
