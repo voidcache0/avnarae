@@ -4,8 +4,32 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Calendar, Shield, Heart, Users } from "lucide-react";
 import heroBackground from "@/assets/hero-background.jpg";
+import { useAuth } from "@/contexts/AuthContext";
+import { ClientHomeView } from "@/components/home/ClientHomeView";
+import { PractitionerHomeView } from "@/components/home/PractitionerHomeView";
+import { AdminHomeView } from "@/components/home/AdminHomeView";
 
 const Home = () => {
+  const { user, role, loading } = useAuth();
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Show role-specific views for logged-in users
+  if (user && role) {
+    if (role === 'admin') return <AdminHomeView />;
+    if (role === 'practitioner') return <PractitionerHomeView />;
+    if (role === 'client') return <ClientHomeView />;
+  }
+
+  // Show public landing page for non-authenticated users
+
   const featuredPractitioners = [
     {
       id: 1,
