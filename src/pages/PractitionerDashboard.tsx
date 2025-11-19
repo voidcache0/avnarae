@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { VerificationBanner } from "@/components/practitioner/VerificationBanner";
 import { ProfileCompleteness } from "@/components/practitioner/ProfileCompleteness";
 import { ProfileEditor } from "@/components/practitioner/ProfileEditor";
+import { ProfilePhotoUpload } from '@/components/practitioner/ProfilePhotoUpload';
+import { MediaGallery } from '@/components/practitioner/MediaGallery';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Booking {
   id: string;
@@ -32,6 +35,7 @@ const PractitionerDashboard = () => {
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'verified' | 'rejected'>('pending');
   const [profileCompleteness, setProfileCompleteness] = useState(0);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [practitionerData, setPractitionerData] = useState<any>(null);
 
   useEffect(() => {
     fetchPractitionerData();
@@ -51,6 +55,7 @@ const PractitionerDashboard = () => {
       if (practError) throw practError;
       setPractitionerId(practData.id);
       setVerificationStatus(practData.verification_status);
+      setPractitionerData(practData);
 
       // Calculate profile completeness
       const fields = [
@@ -154,7 +159,28 @@ const PractitionerDashboard = () => {
 
       <div className="grid gap-6 lg:grid-cols-3 mb-6">
         <div className="lg:col-span-2">
-          {practitionerId && <ProfileEditor practitionerId={practitionerId} />}
+          {practitionerId && (
+            <Tabs defaultValue="profile" className="space-y-6">
+              <TabsList>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="media">Photos</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="profile" className="space-y-6">
+                <ProfileEditor practitionerId={practitionerId} />
+              </TabsContent>
+
+              <TabsContent value="media" className="space-y-6">
+                <ProfilePhotoUpload
+                  practitionerId={practitionerId}
+                  currentPhotoUrl={practitionerData?.cover_photo_url}
+                  userName={`${profile?.first_name || ''} ${profile?.last_name || ''}`}
+                  onUploadComplete={fetchPractitionerData}
+                />
+                <MediaGallery practitionerId={practitionerId} />
+              </TabsContent>
+            </Tabs>
+          )}
         </div>
         <div>
           <ProfileCompleteness 
