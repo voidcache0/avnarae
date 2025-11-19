@@ -20,13 +20,29 @@ export default function PractitionerVerification() {
     if (!user) return;
 
     try {
-      const { data: practitioner } = await supabase
+      const { data: practitioner, error } = await supabase
         .from('practitioners')
         .select('id, verification_status')
         .eq('user_id', user.id)
         .single();
 
-      if (practitioner) {
+      if (error && error.code === 'PGRST116') {
+        // No practitioner record exists, create one
+        const { data: newPractitioner, error: insertError } = await supabase
+          .from('practitioners')
+          .insert({ user_id: user.id })
+          .select('id')
+          .single();
+
+        if (insertError) {
+          console.error('Error creating practitioner:', insertError);
+          return;
+        }
+
+        if (newPractitioner) {
+          setPractitionerId(newPractitioner.id);
+        }
+      } else if (practitioner) {
         setPractitionerId(practitioner.id);
         fetchDocuments(practitioner.id);
       }
