@@ -185,44 +185,165 @@ export type Database = {
         }
         Relationships: []
       }
+      practitioner_documents: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_verified: boolean | null
+          mime_type: string | null
+          practitioner_id: string
+          updated_at: string
+          upload_date: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          practitioner_id: string
+          updated_at?: string
+          upload_date?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          practitioner_id?: string
+          updated_at?: string
+          upload_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practitioner_documents_practitioner_id_fkey"
+            columns: ["practitioner_id"]
+            isOneToOne: false
+            referencedRelation: "practitioners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practitioner_media: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          file_name: string
+          file_path: string
+          id: string
+          media_type: string
+          practitioner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          file_name: string
+          file_path: string
+          id?: string
+          media_type: string
+          practitioner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          media_type?: string
+          practitioner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practitioner_media_practitioner_id_fkey"
+            columns: ["practitioner_id"]
+            isOneToOne: false
+            referencedRelation: "practitioners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       practitioners: {
         Row: {
+          address: string | null
           bio: string | null
+          contact_preferences: Json | null
+          cover_photo_url: string | null
           created_at: string
           hourly_rate: number | null
           id: string
           is_available: boolean | null
+          languages: string[] | null
           location_coordinates: unknown
           location_name: string | null
+          pricing_details: Json | null
+          profile_completeness: number | null
+          qualifications: string[] | null
+          services: string[] | null
           specializations: string[] | null
+          tags: string[] | null
           updated_at: string
           user_id: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           years_of_experience: number | null
         }
         Insert: {
+          address?: string | null
           bio?: string | null
+          contact_preferences?: Json | null
+          cover_photo_url?: string | null
           created_at?: string
           hourly_rate?: number | null
           id?: string
           is_available?: boolean | null
+          languages?: string[] | null
           location_coordinates?: unknown
           location_name?: string | null
+          pricing_details?: Json | null
+          profile_completeness?: number | null
+          qualifications?: string[] | null
+          services?: string[] | null
           specializations?: string[] | null
+          tags?: string[] | null
           updated_at?: string
           user_id: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           years_of_experience?: number | null
         }
         Update: {
+          address?: string | null
           bio?: string | null
+          contact_preferences?: Json | null
+          cover_photo_url?: string | null
           created_at?: string
           hourly_rate?: number | null
           id?: string
           is_available?: boolean | null
+          languages?: string[] | null
           location_coordinates?: unknown
           location_name?: string | null
+          pricing_details?: Json | null
+          profile_completeness?: number | null
+          qualifications?: string[] | null
+          services?: string[] | null
           specializations?: string[] | null
+          tags?: string[] | null
           updated_at?: string
           user_id?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -280,6 +401,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      verification_notes: {
+        Row: {
+          action: string | null
+          admin_id: string
+          created_at: string
+          id: string
+          note: string
+          practitioner_id: string
+        }
+        Insert: {
+          action?: string | null
+          admin_id: string
+          created_at?: string
+          id?: string
+          note: string
+          practitioner_id: string
+        }
+        Update: {
+          action?: string | null
+          admin_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          practitioner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_notes_practitioner_id_fkey"
+            columns: ["practitioner_id"]
+            isOneToOne: false
+            referencedRelation: "practitioners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

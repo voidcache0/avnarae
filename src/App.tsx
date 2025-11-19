@@ -15,7 +15,9 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ClientDashboard from "./pages/ClientDashboard";
 import PractitionerDashboard from "./pages/PractitionerDashboard";
+import PractitionerVerification from "./pages/PractitionerVerification";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminVerification from "./pages/AdminVerification";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,9 +58,19 @@ const App = () => (
                     <DashboardRouter />
                   </ProtectedRoute>
                 } />
+                <Route path="/practitioner/verification" element={
+                  <ProtectedRoute allowedRoles={['practitioner']}>
+                    <PractitionerVerification />
+                  </ProtectedRoute>
+                } />
                 <Route path="/admin" element={
                   <ProtectedRoute allowedRoles={['admin']}>
                     <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/verification" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminVerification />
                   </ProtectedRoute>
                 } />
                 <Route path="*" element={<NotFound />} />
