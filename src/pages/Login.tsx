@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import Header from "@/components/layout/Header";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -49,7 +50,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4 py-12">
+    <>
+      <Header />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4 py-12">
       <Card className="w-full max-w-md shadow-soft">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
@@ -100,6 +103,7 @@ const Login = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 
