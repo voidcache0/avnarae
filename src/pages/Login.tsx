@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,20 +13,39 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, user, role } = useAuth();
+
+  useEffect(() => {
+    if (user && role) {
+      if (role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [user, role, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    const { error } = await signIn(email, password);
+
+    setIsLoading(false);
+
+    if (error) {
       toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
+        title: "Login failed",
+        description: error.message || "Invalid email or password. Please try again.",
+        variant: "destructive",
       });
-      navigate("/dashboard");
-    }, 1000);
+      return;
+    }
+
+    toast({
+      title: "Welcome back!",
+      description: "You have successfully logged in.",
+    });
   };
 
   return (
