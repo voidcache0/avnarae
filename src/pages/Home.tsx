@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Calendar, Shield, Heart, Users } from "lucide-react";
+import heroBackground from "@/assets/hero-background.jpg";
 
 const Home = () => {
   const featuredPractitioners = [
@@ -48,10 +49,14 @@ const Home = () => {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-hero py-20 md:py-32">
+      <section className="relative overflow-hidden py-20 md:py-32">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-64 w-64 animate-glow rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-20 -right-20 h-64 w-64 animate-glow rounded-full bg-secondary/20 blur-3xl" style={{ animationDelay: '1.5s' }} />
+          <img 
+            src={heroBackground} 
+            alt="Mystical spiritual background" 
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-background/60" />
         </div>
 
         <div className="container relative mx-auto px-4 text-center">
