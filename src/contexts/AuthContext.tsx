@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setProfile(null);
     setRole(null);
-    navigate('/login');
+    navigate('/');
   };
 
   const refreshProfile = async () => {

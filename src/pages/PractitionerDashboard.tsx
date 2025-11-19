@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Clock, User, CheckCircle, XCircle, TrendingUp, DollarSign, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VerificationBanner } from "@/components/practitioner/VerificationBanner";
 import { ProfileCompleteness } from "@/components/practitioner/ProfileCompleteness";
@@ -11,6 +11,7 @@ import { ProfileEditor } from "@/components/practitioner/ProfileEditor";
 import { ProfilePhotoUpload } from '@/components/practitioner/ProfilePhotoUpload';
 import { MediaGallery } from '@/components/practitioner/MediaGallery';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface Booking {
   id: string;
@@ -36,6 +37,7 @@ const PractitionerDashboard = () => {
   const [profileCompleteness, setProfileCompleteness] = useState(0);
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [practitionerData, setPractitionerData] = useState<any>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     fetchPractitionerData();
@@ -142,81 +144,151 @@ const PractitionerDashboard = () => {
   const confirmedBookings = bookings.filter(b => 
     b.status === 'confirmed' && new Date(b.booking_date) >= new Date()
   );
-  const totalEarnings = bookings
-    .filter(b => b.status === 'completed')
+  const completedBookings = bookings.filter(b => b.status === 'completed');
+  const totalEarnings = completedBookings.reduce((sum, b) => sum + (b.amount || 0), 0);
+  
+  // Performance metrics
+  const thisMonthEarnings = completedBookings
+    .filter(b => {
+      const bookingDate = new Date(b.booking_date);
+      const now = new Date();
+      return bookingDate.getMonth() === now.getMonth() && bookingDate.getFullYear() === now.getFullYear();
+    })
     .reduce((sum, b) => sum + (b.amount || 0), 0);
+  
+  const thisMonthBookings = completedBookings.filter(b => {
+    const bookingDate = new Date(b.booking_date);
+    const now = new Date();
+    return bookingDate.getMonth() === now.getMonth() && bookingDate.getFullYear() === now.getFullYear();
+  }).length;
+  
+  const avgSessionRate = completedBookings.length > 0 
+    ? totalEarnings / completedBookings.length 
+    : 0;
+  
+  const completionRate = bookings.length > 0
+    ? (completedBookings.length / bookings.length) * 100
+    : 0;
 
   return (
     <div className="container py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Welcome, {profile?.first_name}!</h1>
-        <p className="text-muted-foreground mt-2">Manage your sessions and availability</p>
+        <p className="text-muted-foreground mt-2">Your Performance Dashboard</p>
       </div>
 
       <div className="mb-6">
         <VerificationBanner status={verificationStatus} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3 mb-6">
-        <div className="lg:col-span-2">
-          {practitionerId && (
-            <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="media">Photos</TabsTrigger>
-              </TabsList>
+      {/* Performance Metrics - Top Priority */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <Card className="border-primary/20">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardDescription>This Month Earnings</CardDescription>
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
+            <CardTitle className="text-4xl font-bold text-primary">R{thisMonthEarnings.toFixed(0)}</CardTitle>
+          </CardHeader>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardDescription>Completion Rate</CardDescription>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <CardTitle className="text-4xl">{completionRate.toFixed(0)}%</CardTitle>
+          </CardHeader>
+        </Card>
 
-              <TabsContent value="profile" className="space-y-6">
-                <ProfileEditor practitionerId={practitionerId} />
-              </TabsContent>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardDescription>Avg. Session Rate</CardDescription>
+            <CardTitle className="text-4xl">R{avgSessionRate.toFixed(0)}</CardTitle>
+          </CardHeader>
+        </Card>
 
-              <TabsContent value="media" className="space-y-6">
-                <ProfilePhotoUpload
-                  practitionerId={practitionerId}
-                  currentPhotoUrl={practitionerData?.cover_photo_url}
-                  userName={`${profile?.first_name || ''} ${profile?.last_name || ''}`}
-                  onUploadComplete={fetchPractitionerData}
-                />
-                <MediaGallery practitionerId={practitionerId} />
-              </TabsContent>
-            </Tabs>
-          )}
-        </div>
-        <div>
-          <ProfileCompleteness 
-            completeness={profileCompleteness}
-            missingFields={missingFields}
-          />
-        </div>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardDescription>Total Earnings</CardDescription>
+            <CardTitle className="text-4xl">R{totalEarnings.toFixed(0)}</CardTitle>
+          </CardHeader>
+        </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      {/* Quick Stats */}
+      <div className="grid gap-6 md:grid-cols-3 mb-8">
         <Card>
           <CardHeader>
-            <CardTitle className="text-4xl">{pendingBookings.length}</CardTitle>
+            <CardTitle className="text-3xl">{pendingBookings.length}</CardTitle>
             <CardDescription>Pending Bookings</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-4xl">{confirmedBookings.length}</CardTitle>
+            <CardTitle className="text-3xl">{confirmedBookings.length}</CardTitle>
             <CardDescription>Upcoming Sessions</CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-4xl">{bookings.length}</CardTitle>
-            <CardDescription>Total Bookings</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-4xl">R{totalEarnings.toFixed(0)}</CardTitle>
-            <CardDescription>Total Earnings</CardDescription>
+            <CardTitle className="text-3xl">{thisMonthBookings}</CardTitle>
+            <CardDescription>Sessions This Month</CardDescription>
           </CardHeader>
         </Card>
       </div>
 
+      {/* Collapsible Profile Editor */}
+      <div className="mb-8">
+        <Collapsible open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Profile Management</h2>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                {isProfileOpen ? 'Hide Profile Editor' : 'Edit Profile'}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          
+          <CollapsibleContent>
+            <div className="grid gap-6 lg:grid-cols-3 mb-6">
+              <div className="lg:col-span-2">
+                {practitionerId && (
+                  <Tabs defaultValue="profile" className="space-y-6">
+                    <TabsList>
+                      <TabsTrigger value="profile">Profile</TabsTrigger>
+                      <TabsTrigger value="media">Photos</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="profile" className="space-y-6">
+                      <ProfileEditor practitionerId={practitionerId} />
+                    </TabsContent>
+
+                    <TabsContent value="media" className="space-y-6">
+                      <ProfilePhotoUpload
+                        practitionerId={practitionerId}
+                        currentPhotoUrl={practitionerData?.cover_photo_url}
+                        userName={`${profile?.first_name || ''} ${profile?.last_name || ''}`}
+                        onUploadComplete={fetchPractitionerData}
+                      />
+                      <MediaGallery practitionerId={practitionerId} />
+                    </TabsContent>
+                  </Tabs>
+                )}
+              </div>
+              <div>
+                <ProfileCompleteness 
+                  completeness={profileCompleteness}
+                  missingFields={missingFields}
+                />
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
       <div className="mb-6">
         <h2 className="text-2xl font-semibold">Booking Requests</h2>
       </div>
